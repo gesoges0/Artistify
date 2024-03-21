@@ -76,6 +76,7 @@ class Artist:
 @dataclass(frozen=True)
 class Track:
     name: str
+    uri: str
     artists: list[Artist]
 
     @classmethod
@@ -189,6 +190,7 @@ class Track:
         """
         return cls(
             name=track_dict["track"]["name"],
+            uri=track_dict["track"]["uri"],
             artists=[
                 Artist.from_dict(artist_dict)
                 for artist_dict in track_dict["track"]["artists"]
