@@ -1,7 +1,12 @@
-from api.spotify import Spotify
-import requests
-from functools import cached_property
+import json
+from collections import defaultdict
 from dataclasses import dataclass
+from functools import cached_property
+from pathlib import Path
+
+import requests
+
+from api.spotify import Spotify
 
 
 class Playlist(Spotify):
@@ -54,6 +59,7 @@ class PlaylistModel:
 class Artist:
     name: str
     id: str
+    uri: str
     external_url: str
 
     @classmethod
@@ -69,6 +75,7 @@ class Artist:
         return cls(
             name=d["name"],
             id=d["id"],
+            uri=d["uri"],
             external_url=d["external_urls"]["spotify"],
         )
 
@@ -76,6 +83,7 @@ class Artist:
 @dataclass(frozen=True)
 class Track:
     name: str
+    id: str
     uri: str
     artists: list[Artist]
 
@@ -190,6 +198,7 @@ class Track:
         """
         return cls(
             name=track_dict["track"]["name"],
+            id=track_dict["track"]["id"],
             uri=track_dict["track"]["uri"],
             artists=[
                 Artist.from_dict(artist_dict)
@@ -198,7 +207,7 @@ class Track:
         )
 
 
-def show_songs_and_artists(playlist_id: str):
+def show_tracks(playlist_id: str):
     """(アーティスト, 楽曲)一覧を返す"""
     playlist: Playlist = Playlist(playlist_id)
 
@@ -208,8 +217,40 @@ def show_songs_and_artists(playlist_id: str):
         print(f'artists: {", ".join([artist.name for artist in track.artists])}')
 
 
-def get_songs_by_artist_dict(playlist_id: str):
+def _get_tracks_by_artist(playlist_id: str) -> dict[Artist, list[Track]]:
     """{アーティスト: {楽曲1, 楽曲2, ...}}のマップを返す
     ただし, 楽曲1に対してアーティストが複数いる場合は, {アーティストA: {楽曲1}, アーティストB: {楽曲1}}となる.
     """
-    pass
+    playlist: Playlist = Playlist(playlist_id)
+
+    tracks_by_artist = defaultdict(list)
+
+    for track in playlist.playlist_response_model.tracks:
+        for artist in track.artists:
+            tracks_by_artist[artist].append(track)
+
+    return tracks_by_artist
+
+
+def output_tracks_by_artist(playlist_id: str, output_path: Path, attr: str) -> None:
+    tracks_by_artist: dict[Artist, list[Track]] = _get_tracks_by_artist(
+        playlist_id=playlist_id
+    )
+
+    available_attrs = {field.name for field in Track.__dataclass_fields__.values()} & {
+        field.name for field in Artist.__dataclass_fields__.values()
+    }
+
+    assert attr in available_attrs, f"attr must be in {available_attrs}"
+
+    # TODO: option
+    # ---------------------------------
+    # ---------------------------------
+
+    output_obj = {
+        getattr(artist, attr): [getattr(track, attr) for track in tracks]
+        for artist, tracks in tracks_by_artist.items()
+    }
+
+    with open(output_path, "w") as output:
+        json.dump(output_obj, output)

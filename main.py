@@ -1,7 +1,9 @@
 import os
+from pathlib import Path
+
 import click
-from api.artist import get_artist_infos
-from api.playlist import show_songs_and_artists
+
+from api.playlist import output_tracks_by_artist, show_tracks
 
 
 @click.group()
@@ -11,18 +13,20 @@ def cli():
 
 @cli.command()
 @click.argument("playlist_id")
-def show_songs_and_artists_in_playlist(playlist_id: str):
+def show_tracks_in_playlist(playlist_id: str):
     """Get information about a playlist."""
     click.echo(f"Getting playlist info for ID: {playlist_id}")
-    show_songs_and_artists(playlist_id)
+    show_tracks(playlist_id)
 
 
 @cli.command()
-@click.argument("artist_id")
-def get_artist_info(artist_id):
+@click.argument("playlist_id")
+@click.argument("output_path")
+@click.argument("attr", default="id")
+def output_tracks_by_artist_in_playlist(playlist_id: str, output_path: str, attr: str):
     """Get information about an artist."""
-    click.echo(f"Getting artist info for ID: {artist_id}")
-    get_artist_infos(artist_id)
+    click.echo(f"Getting playlist info for ID: {playlist_id}")
+    output_tracks_by_artist(playlist_id, Path(output_path), attr)
 
 
 if __name__ == "__main__":
