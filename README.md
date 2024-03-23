@@ -70,3 +70,6 @@ The playlists for the artists Sia, ZAYN, Coldplay, and Usher, respectively, will
 ![original](./img/origin.png)
 ![new_playlists](./img/new_playlists.png)
 ![sia_playlist](./img/sia.png)
+
+## ToDo
+Based on the image above, it's clear that the song "yeah" features Usher as the main vocalist, but playlists for Lil Jon and Ludacris were also created. I'll revise it to create playlists only for Usher.
