@@ -12,7 +12,7 @@ CLIENT_SECRET=xxxxxxxxxx
 
 ### usage of each api
 
-#### show_tracks_in_playlist
+#### # show_tracks_in_playlist
 show (song, list of artists) in a playlist
 ```
 $ python main.py show-tracks-in-playlist 6CpQWdViAFjjnXCEudZVQR
@@ -43,7 +43,7 @@ track: Shape of My Heart
 artists: Backstreet Boys
 ```
 
-#### output_tracks_by_artist_in_playlist
+#### # output_tracks_by_artist_in_playlist
 This command outputs a JSON summary of the songs in the specified playlist by artist.
 The following example is based on my [playlist](https://open.spotify.com/playlist/3F9A3KdcaLXnI59AM9a4uV?si=fc9bea86aa784d62) as input.
 ```
@@ -59,7 +59,7 @@ $ cat hoge.json
 ```
 
 
-#### artisfy
+#### # artisfy
 ```
 $ python main.py artisfy 3F9A3KdcaLXnI59AM9a4uV
 ```
