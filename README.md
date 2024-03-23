@@ -1,16 +1,14 @@
 # Artistify
-
-
+Artistify creates artist-specific playlists from existing ones.
 
 ## Usage
+Please prepare a .env file first.
 
 ### .env file
 ```plaintext
 CLIENT_ID=xxxxxxxxxx
 CLIENT_SECRET=xxxxxxxxxx
-PLAYLIST_ID=xxxxxxxxxx
 ```
-
 
 ### usage of each api
 
