@@ -22,7 +22,7 @@ def show_tracks_in_playlist(playlist_id: str):
 @cli.command()
 @click.argument("playlist_id")
 @click.argument("output_path")
-@click.argument("attr", default="id")
+@click.argument("attr", required=False)
 def output_tracks_by_artist_in_playlist(playlist_id: str, output_path: str, attr: str):
     """Get information about an artist."""
     click.echo(f"Getting playlist info for ID: {playlist_id}")

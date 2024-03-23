@@ -39,6 +39,7 @@ class PlaylistModel:
     name: str
     total_tracks: int
     tracks: list["Track"]
+    owner: "Owner"
 
     @classmethod
     def from_playlist_response(cls, response: dict):
@@ -50,9 +51,21 @@ class PlaylistModel:
                     Track.from_track_dict(track_dict)
                     for track_dict in response["tracks"]["items"]
                 ],
+                owner=Owner.from_dict(response["owner"]),
             )
         else:
             raise Exception(f"Unknown playlist response: {response}")
+
+
+@dataclass(frozen=True)
+class Owner:
+    display_name: str
+    id: str
+    uri: str
+
+    @classmethod
+    def from_dict(cls, d):
+        return cls(d["display_name"], d["id"], d["uri"])
 
 
 @dataclass(frozen=True)
@@ -217,11 +230,15 @@ def show_tracks(playlist_id: str):
         print(f'artists: {", ".join([artist.name for artist in track.artists])}')
 
 
+def _get_playlist(playlist_id: str) -> Playlist:
+    return Playlist(playlist_id=playlist_id)
+
+
 def _get_tracks_by_artist(playlist_id: str) -> dict[Artist, list[Track]]:
     """{アーティスト: {楽曲1, 楽曲2, ...}}のマップを返す
     ただし, 楽曲1に対してアーティストが複数いる場合は, {アーティストA: {楽曲1}, アーティストB: {楽曲1}}となる.
     """
-    playlist: Playlist = Playlist(playlist_id)
+    playlist = _get_playlist(playlist_id=playlist_id)
 
     tracks_by_artist = defaultdict(list)
 
@@ -232,24 +249,39 @@ def _get_tracks_by_artist(playlist_id: str) -> dict[Artist, list[Track]]:
     return tracks_by_artist
 
 
-def output_tracks_by_artist(playlist_id: str, output_path: Path, attr: str) -> None:
+def _get_added_by(playlist_id: str) -> Owner:
+    playlist = _get_playlist(playlist_id=playlist_id)
+    return playlist.playlist_response_model.owner
+
+
+def output_tracks_by_artist(
+    playlist_id: str, output_path: Path, attr: str | None
+) -> None:
     tracks_by_artist: dict[Artist, list[Track]] = _get_tracks_by_artist(
         playlist_id=playlist_id
     )
+    user_id: str = _get_added_by(playlist_id=playlist_id).id
 
-    available_attrs = {field.name for field in Track.__dataclass_fields__.values()} & {
-        field.name for field in Artist.__dataclass_fields__.values()
-    }
+    if attr:
+        available_attrs = {
+            field.name for field in Track.__dataclass_fields__.values()
+        } & {field.name for field in Artist.__dataclass_fields__.values()}
+        assert attr in available_attrs, f"attr must be in {available_attrs}"
 
-    assert attr in available_attrs, f"attr must be in {available_attrs}"
+    artist_attr, track_attr = (attr, attr) if attr else ("name", "id")
 
     # TODO: option
     # ---------------------------------
     # ---------------------------------
 
     output_obj = {
-        getattr(artist, attr): [getattr(track, attr) for track in tracks]
-        for artist, tracks in tracks_by_artist.items()
+        "playlist": {
+            getattr(artist, artist_attr): [
+                getattr(track, track_attr) for track in tracks
+            ]
+            for artist, tracks in tracks_by_artist.items()
+        },
+        "owner": user_id,
     }
 
     with open(output_path, "w") as output:
