@@ -33,6 +33,22 @@ class Playlist(Spotify):
     def playlist_response_model(self) -> "PlaylistModel":
         return PlaylistModel.from_playlist_response(self.playlist_response)
 
+    def create_playlist_tracks_by_artist(self):
+        for artist, _ in _get_tracks_by_artist(self.playlist_id).items():
+            playlist_response = requests.post(
+                url=f"https://api.spotify.com/v1/users/{self.playlist_response_model.owner.id}/playlists",
+                headers={
+                    "Authorization": f"Bearer {self.secret_access_token}",
+                    "Content-Type": "application/json",
+                },
+                json={
+                    "name": artist.name,
+                    "description": f"{artist.name}'s songs in {self.playlist_response_model.name} playlist",
+                    "public": True,
+                },
+            )
+            print(artist.name, playlist_response.text)
+
 
 @dataclass(frozen=True)
 class PlaylistModel:
@@ -286,3 +302,8 @@ def output_tracks_by_artist(
 
     with open(output_path, "w") as output:
         json.dump(output_obj, output)
+
+
+def create_each_artist_playlist(playlist_id):
+    playlist = _get_playlist(playlist_id=playlist_id)
+    playlist.create_playlist_tracks_by_artist()

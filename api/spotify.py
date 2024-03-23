@@ -1,4 +1,5 @@
 import os
+import base64
 from dataclasses import dataclass
 from functools import cached_property
 
@@ -33,8 +34,26 @@ class Spotify:
             "client_secret": self.client_secret,
         }
 
+    @property
+    def client_credentials(self):
+        return f"{self.client_id}:{self.client_secret}"
+
+    @property
+    def client_credentials_b64(self):
+        return base64.b64encode(s=self.client_credentials.encode()).decode()
+
     @cached_property
     def access_token(self):
         token_response = requests.post(self.token_url, data=self.token_data)
+        access_token = token_response.json()["access_token"]
+        return access_token
+
+    @property
+    def secret_access_token(self):
+        token_response = requests.post(
+            self.token_url,
+            headers={"Authorization": f"Basic {self.client_credentials_b64}"},
+            data={"grant_type": "client_credentials"},
+        )
         access_token = token_response.json()["access_token"]
         return access_token
