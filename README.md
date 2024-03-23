@@ -60,3 +60,13 @@ $ cat hoge.json
 {"USHER": ["Yeah! (feat. Lil Jon & Ludacris)"], "Lil Jon": ["Yeah! (feat. Lil Jon & Ludacris)"], "Ludacris": ["Yeah! (feat. Lil Jon & Ludacris)"], "Coldplay": ["Yellow"], "ZAYN": ["Dusk Till Dawn (feat. Sia) - Radio Edit"], "Sia": ["Dusk Till Dawn (feat. Sia) - Radio Edit", "Titanium (feat. Sia)", "Elastic Heart"], "David Guetta": ["Titanium (feat. Sia)"]}
 ```
 
+
+#### artisfy
+```
+$ python main.py artisfy 3F9A3KdcaLXnI59AM9a4uV
+```
+The playlists for the artists Sia, ZAYN, Coldplay, and Usher, respectively, will be created.
+
+[original](./img/origin.png)
+[new_playlists](./img/new_playlists.png)
+[sia_playlist](./img/sia.png)
