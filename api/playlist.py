@@ -34,20 +34,31 @@ class Playlist(Spotify):
         return PlaylistModel.from_playlist_response(self.playlist_response)
 
     def create_playlist_tracks_by_artist(self):
-        for artist, _ in _get_tracks_by_artist(self.playlist_id).items():
+        access_token = self.outh()
+        tracks_by_artist = _get_tracks_by_artist(self.playlist_id)
+        for artist, tracks in tracks_by_artist.items():
+            # make playlist
             playlist_response = requests.post(
                 url=f"https://api.spotify.com/v1/users/{self.playlist_response_model.owner.id}/playlists",
                 headers={
-                    "Authorization": f"Bearer {self.secret_access_token}",
+                    "Authorization": f"Bearer {access_token}",
                     "Content-Type": "application/json",
                 },
                 json={
-                    "name": artist.name,
+                    "name": f"{artist.name} from {self.playlist_response_model.name}",
                     "description": f"{artist.name}'s songs in {self.playlist_response_model.name} playlist",
-                    "public": True,
+                    "public": True,  # public ?
                 },
             )
-            print(artist.name, playlist_response.text)
+            # add tracks
+            track_response = requests.post(
+                url=f"https://api.spotify.com/v1/playlists/{playlist_response.json()['id']}/tracks",
+                headers={
+                    "Authorization": f"Bearer {access_token}",
+                    "Content-Type": "application/json",
+                },
+                json={"uris": [track.uri for track in tracks]},
+            )
 
 
 @dataclass(frozen=True)

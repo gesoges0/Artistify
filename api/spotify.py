@@ -2,6 +2,7 @@ import os
 import base64
 from dataclasses import dataclass
 from functools import cached_property
+import urllib.parse
 
 import requests
 from dotenv import load_dotenv
@@ -56,4 +57,52 @@ class Spotify:
             data={"grant_type": "client_credentials"},
         )
         access_token = token_response.json()["access_token"]
+        return access_token
+
+    def outh(self):
+        redirect_uri = "http://localhost:8887/callback"
+
+        # Spotify authorization urls
+        auth_url = "https://accounts.spotify.com/authorize"
+        token_url = "https://accounts.spotify.com/api/token"
+
+        # authorization page params
+        auth_params = {
+            "client_id": self.client_id,
+            "response_type": "code",
+            "redirect_uri": redirect_uri,
+            "scope": "playlist-modify-public",
+        }
+
+        # generate authorization url
+        auth_url_with_params = auth_url + "?" + urllib.parse.urlencode(auth_params)
+
+        # ------------------------------------------------------------------------------------------------
+        # input xxxx from uri ?code=xxxx
+        print(
+            "Please go to the following URL and authorize access:", auth_url_with_params
+        )
+        # ------------------------------------------------------------------------------------------------
+
+        # authorization code from user input
+        auth_code = input("Enter the authorization code: ")
+
+        # request body for access token
+        token_data = {
+            "grant_type": "authorization_code",
+            "code": auth_code,
+            "redirect_uri": redirect_uri,
+        }
+
+        # request headers
+        headers = {
+            "Authorization": f"Basic {self.client_credentials_b64}",
+            "Content-Type": "application/x-www-form-urlencoded",
+        }
+
+        # get access token
+        token_response = requests.post(token_url, headers=headers, data=token_data)
+        token_data = token_response.json()
+        access_token = token_data["access_token"]
+
         return access_token
