@@ -67,6 +67,6 @@ $ python main.py artisfy 3F9A3KdcaLXnI59AM9a4uV
 ```
 The playlists for the artists Sia, ZAYN, Coldplay, and Usher, respectively, will be created.
 
-[original](./img/origin.png)
-[new_playlists](./img/new_playlists.png)
-[sia_playlist](./img/sia.png)
+![original](./img/origin.png)
+![new_playlists](./img/new_playlists.png)
+![sia_playlist](./img/sia.png)
