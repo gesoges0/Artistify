@@ -2,9 +2,9 @@
 Artistify creates artist-specific playlists from existing ones.
 
 ## Usage
-Please prepare a .env file first.
 
 ### .env file
+Please prepare a .env file first.
 ```plaintext
 CLIENT_ID=xxxxxxxxxx
 CLIENT_SECRET=xxxxxxxxxx
